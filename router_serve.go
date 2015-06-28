@@ -33,6 +33,15 @@ func (rootRouter *Router) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	closure.Routers[0] = rootRouter
 	closure.Contexts = make([]reflect.Value, 1, rootRouter.maxChildrenDepth)
 	closure.Contexts[0] = reflect.New(rootRouter.contextType)
+    for key, value := range rootRouter.contextValues {
+        f := closure.Contexts[0].Elem().FieldByName(key)
+        if f.IsValid() {
+            if f.CanSet() {
+                f.Set(value)
+            }
+        }
+    }
+
 	closure.currentMiddlewareLen = len(rootRouter.middleware)
 	closure.RootRouter = rootRouter
 	closure.Request.rootContext = closure.Contexts[0]

@@ -28,7 +28,7 @@ type Router struct {
 
 	// For each request we'll create one of these objects
 	contextType reflect.Type
-
+    contextValues map[string]reflect.Value
 	// Eg, "/" or "/admin". Any routes added to this router will be prefixed with this.
 	pathPrefix string
 
@@ -97,6 +97,16 @@ func New(ctx interface{}) *Router {
 		r.root[method] = newPathNode()
 	}
 	return r
+}
+
+
+func NewWithContext(ctx interface{}, context map[string]interface{}) *Router {
+    r := New(ctx)
+    r.contextValues = make(map[string]reflect.Value)
+    for key, value := range context {
+        r.contextValues[key] = reflect.ValueOf(value)
+    }
+    return r
 }
 
 // NewWithPrefix returns a new router (see New) but each route will have an implicit prefix.
